@@ -1,0 +1,138 @@
+﻿<Window x:Class="LogTool.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:LogTool"
+        mc:Ignorable="d"
+        Title="Log Viewer" Height="450" Width="800"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}"
+        AllowDrop="True"
+
+        Drop="MainWindow_OnDrop"
+        >
+    <DockPanel>
+        <Label DockPanel.Dock="Top" x:Name="EmptyPrompt"
+                    Margin="0 100 0 0"
+                   FontSize="20"
+                   HorizontalContentAlignment="Center"
+        >Drag + drop something here</Label>
+
+        <DockPanel x:Name="LogPanel" Visibility="Collapsed">
+            <!-- Log file selection -->
+            <ComboBox x:Name="LogTree"
+                      DockPanel.Dock="Top"
+                      ItemsSource="{Binding ParsedLogs}"
+                      SelectedItem="{Binding SelectedLog, Mode=TwoWay}"
+                      HorizontalAlignment="Stretch"
+                      DisplayMemberPath="LogFile"
+                      Margin="5" />
+
+            <!-- Account list -->
+            <ListBox ItemsSource="{Binding SelectedLog.Accounts.Values}"
+                     SelectedItem="{Binding SelectedAccount, Mode=TwoWay}"
+                     x:Name="AccountList"
+                     DockPanel.Dock="Left">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <WrapPanel>
+                            <Image Width="32" Height="32">
+                                <Image.Source>
+                                    <BitmapImage UriSource="{Binding Path=Icon}" />
+                                </Image.Source>
+                            </Image>
+                            <TextBlock x:Name="AccountName" Text="{Binding Path=Name}" />
+                        </WrapPanel>
+
+                        <!-- Make the account text red if not synced -->
+                        <DataTemplate.Triggers>
+                            <DataTrigger Binding="{Binding Path=SyncQueue.Synced}">
+                                <Setter TargetName="AccountName" Property="Foreground" Value="Red" />
+                                <DataTrigger.Value>false</DataTrigger.Value>
+                            </DataTrigger>
+                        </DataTemplate.Triggers>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <!-- Account details -->
+            <DockPanel DockPanel.Dock="Right" Margin="5">
+
+                <Grid DockPanel.Dock="Top" HorizontalAlignment="Stretch">
+                    <TextBlock DockPanel.Dock="Top" Margin="5">
+                        Last sync:
+                        <TextBlock Text="{Binding SelectedAccount.SyncQueue.LastSync}" />
+                    </TextBlock>
+
+                    <Button HorizontalAlignment="Right" Click="ExportJson_Click">Export JSON</Button>
+                </Grid>
+
+                <TabControl>
+
+                    <TabItem Header="Calendars">
+                        <DockPanel Margin="5">
+
+                            <!-- Calendar list -->
+                            <ListBox ItemsSource="{Binding SelectedAccount.Calendars.Values}"
+                                     SelectedItem="{Binding SelectedCalendar, Mode=TwoWay}">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Path=Title}"
+                                                   Background="{Binding ColorString}"
+                                                   Padding="5 2 5 2" />
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+
+                            <!-- Calendar data -->
+                            <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="5 0 0 0">
+                                <ItemsControl ItemsSource="{Binding SelectedCalendar.ExtraData}" VerticalAlignment="Top">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <UniformGrid>
+                                                <TextBlock Text="{Binding Path=Key}" />
+                                                <TextBlock Text="{Binding Path=Value}" />
+                                            </UniformGrid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+
+                        </DockPanel>
+                    </TabItem>
+
+                    <TabItem Header="Sync Details">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="5 0 0 0">
+                            <ItemsControl ItemsSource="{Binding SelectedAccount.SyncQueue.Items}" VerticalAlignment="Top">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <UniformGrid>
+                                            <TextBlock Text="{Binding Path=.}" />
+                                        </UniformGrid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </TabItem>
+
+                    <TabItem Header="Account Data">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="5 0 0 0">
+                            <ItemsControl ItemsSource="{Binding SelectedAccount.ExtraData}" VerticalAlignment="Top">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <UniformGrid>
+                                            <TextBlock Text="{Binding Path=Key}" />
+                                            <TextBlock Text="{Binding Path=Value}" />
+                                        </UniformGrid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </TabItem>
+                </TabControl>
+            </DockPanel>
+
+
+        </DockPanel>
+    </DockPanel>
+</Window>
