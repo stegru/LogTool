@@ -272,6 +272,8 @@ namespace LogTool.LogProcessor.Parser
             string json = content.Replace(";\n", ",\n").Replace("=", ":").Replace("(", "[").Replace(")", "]");
             // Quote unquoted non-number values
             json = new Regex(@"(?<key>^\s+(\w+|""[^""]*"")\s:\s)(?<value>(?!"")(?![0-9]+,)[^, ]+),$", RegexOptions.Multiline).Replace(json, "${key}\"${value}\",");
+            // fix the \U escsape code
+            json = json.Replace("\\U", "\\u");
 
             return Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
 
