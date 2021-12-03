@@ -170,7 +170,7 @@ namespace LogTool.LogProcessor.Parser
             foreach (string logEntry in logEntries)
             {
                 Account account = Account.FromLogEntry(logEntry);
-                this.log.Accounts.Add(account.Id, account);
+                this.log.Accounts[account.Id] = account;
             }
         }
 

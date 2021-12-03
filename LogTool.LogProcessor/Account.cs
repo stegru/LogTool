@@ -57,7 +57,7 @@ namespace LogTool.LogProcessor
 
         public void AddCalendar(Calendar calendar)
         {
-            this.Calendars.Add(calendar.Id, calendar);
+            this.Calendars[calendar.Id] =  calendar;
         }
     }
 }
